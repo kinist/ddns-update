@@ -1,0 +1,21 @@
+ddns:
+  server: api-ipv4.dynu.com
+  port: 8245
+  protocol: http
+  path: /nic/update
+  username: username
+  password: password
+  domains:
+  - yourname1.dynudomain.com
+  - yourname2.dynudomain.com
+  - yourname3.dynudomain.com
+  - yourname4.dynudomain.com
+  last_ip: 127.0.0.1
+smtp:
+  server: mail.qq.com
+  port: 465
+  username: yourname@qq.com
+  password: password
+  sender: yourname@sender.com
+  receiver: yourname@receiver.com
+  use_tls: false
