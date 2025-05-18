@@ -45,7 +45,7 @@ def create_readme():
 def build_for_platform(target_platform, target_arch=None):
     """为特定平台和架构打包程序"""
     # 设置平台相关参数
-    if target_platform == 'windows':
+    if target_platform == 'windows_x86':
         output_name = 'ddns-update'
         icon_file = 'icon.ico'
         extension = '.exe'
@@ -75,7 +75,7 @@ def build_for_platform(target_platform, target_arch=None):
     ]
     
     # 只有Windows平台才添加图标
-    if target_platform == 'windows':
+    if target_platform == 'windows_x86':
         cmd.extend(['--icon', icon_file])
     
     # 添加主程序文件
@@ -84,7 +84,7 @@ def build_for_platform(target_platform, target_arch=None):
     # 如果是交叉编译，添加目标平台参数
     if target_platform != sys.platform:
         if (target_platform == 'linux' and sys.platform.startswith('win')) or \
-           (target_platform == 'windows' and sys.platform.startswith('linux')):
+           (target_platform == 'windows_x86' and sys.platform.startswith('linux')):
             cmd.append('--target-platform')
             cmd.append(target_platform)
     
@@ -138,7 +138,7 @@ smtp:
 def main():
     """主函数"""
     parser = argparse.ArgumentParser(description='DDNS客户端打包工具')
-    parser.add_argument('--platform', choices=['all', 'windows', 'linux_x86', 'linux_arm'], 
+    parser.add_argument('--platform', choices=['all', 'windows_x86', 'linux_x86', 'linux_arm'], 
                         default='all', help='目标平台')
     args = parser.parse_args()
     
@@ -146,8 +146,8 @@ def main():
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
     
     # 根据参数打包指定平台
-    if args.platform == 'all' or args.platform == 'windows':
-        build_for_platform('windows')
+    if args.platform == 'all' or args.platform == 'windows_x86':
+        build_for_platform('windows_x86')
     
     if args.platform == 'all' or args.platform == 'linux_x86':
         build_for_platform('linux')
