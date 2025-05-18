@@ -135,10 +135,10 @@ class DDNSClient:
             # 根据端口选择连接方式
             if self.smtp_config['port'] == 465:
                 # 465端口使用SSL
-                server = smtplib.SMTP_SSL(self.smtp_config['server'], self.smtp_config['port'])
+                server = smtplib.SMTP_SSL(self.smtp_config['server'], self.smtp_config['port'], timeout=30)  # 添加超时
             else:
                 # 其他端口使用普通SMTP
-                server = smtplib.SMTP(self.smtp_config['server'], self.smtp_config['port'])
+                server = smtplib.SMTP(self.smtp_config['server'], self.smtp_config['port'], timeout=30)  # 添加超时
                 if self.smtp_config.get('use_tls', True):
                     logging.info("启用TLS加密连接")
                     server.starttls()
@@ -169,7 +169,7 @@ class DDNSClient:
         # 方式1：使用 oray 的接口
         try:
             result = subprocess.run(['curl', '-s', 'http://ddns.oray.com/checkip'], 
-                                 capture_output=True, text=True)
+                                 capture_output=True, text=True, timeout=30)  # 添加超时
             if result.returncode == 0:
                 match = re.search(r'Current IP Address: (\d+\.\d+\.\d+\.\d+)', result.stdout)
                 if match:
@@ -182,7 +182,7 @@ class DDNSClient:
         # 方式2：使用 ipip.net 的接口
         try:
             result = subprocess.run(['curl', '-s', 'https://myip.ipip.net'], 
-                                 capture_output=True, text=True)
+                                 capture_output=True, text=True, timeout=30)  # 添加超时
             if result.returncode == 0:
                 match = re.search(r'当前 IP：(\d+\.\d+\.\d+\.\d+)', result.stdout)
                 if match:
@@ -221,7 +221,7 @@ class DDNSClient:
             
             # 使用GET方法发送请求
             logging.info(f"使用GET方法发送DDNS更新请求")
-            response = requests.get(self.api_url, params=params)
+            response = requests.get(self.api_url, params=params, timeout=30)  # 添加30秒超时
             response.raise_for_status()
             
             response_text = response.text.strip()
@@ -229,37 +229,41 @@ class DDNSClient:
             
             if response_text.startswith('good'):
                 logging.info(f"域名 {domain} DDNS更新成功")
-                return True
+                result = True
             elif response_text.startswith('nochg'):
                 logging.info(f"域名 {domain} IP地址未变化")
-                return True
+                result = True
             elif response_text.startswith('badauth'):
                 error_msg = f"域名 {domain} 认证失败，请检查用户名和密码"
                 logging.error(error_msg)
-                return False
+                result = False
             elif response_text.startswith('911'):
                 error_msg = f"域名 {domain} 服务器维护中，10分钟后重试"
                 logging.error(error_msg)
-                return False
+                result = False
             elif response_text.startswith('notfqdn'):
                 error_msg = f"域名 {domain} 格式无效"
                 logging.error(error_msg)
-                return False
+                result = False
             elif response_text.startswith('nohost'):
                 error_msg = f"域名 {domain} 未找到"
                 logging.error(error_msg)
-                return False
+                result = False
             elif response_text.startswith('dnserr'):
                 error_msg = f"域名 {domain} DNS服务器错误"
                 logging.error(error_msg)
-                return False
+                result = False
             else:
                 error_msg = f"域名 {domain} DDNS更新失败: {response_text}"
                 logging.error(error_msg)
-                return False
+                result = False
+            
+            logging.info(f"域名 {domain} 的DDNS更新处理已完成")
+            return result
         except Exception as e:
             error_msg = f"更新域名 {domain} DDNS时出错: {e}"
             logging.error(error_msg)
+            logging.info(f"域名 {domain} 的DDNS更新处理已完成(出错)")
             return False
 
     def update_all_domains(self):
@@ -298,15 +302,18 @@ class DDNSClient:
         # 检查是否有配置域名
         if not self.domains:
             logging.error("未配置任何域名")
+            logging.info("DDNS客户端运行结束")
             return
         
         # 获取当前公网IP
         if not self.get_public_ip():
+            logging.info("DDNS客户端运行结束")
             return
         
         # 比较IP是否发生变化
         if self.current_ip == self.cached_ip:
             logging.info("IP地址未发生变化，无需更新")
+            logging.info("DDNS客户端运行结束")
             return
         
         # 更新所有域名的DDNS
@@ -334,6 +341,8 @@ class DDNSClient:
             self.save_config()
         else:
             logging.error("部分域名DDNS更新失败")
+            
+        logging.info("DDNS客户端运行结束")
 
 def main():
     # 解析命令行参数

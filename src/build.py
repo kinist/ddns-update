@@ -16,7 +16,6 @@ def create_readme():
 1. 配置文件说明
    - 请修改config.yaml中的配置信息
    - 包括DDNS账号信息和邮件通知设置
-   - 首次运行会自动生成配置文件模板
 
 2. 运行程序
    Windows系统：
