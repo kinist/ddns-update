@@ -31,8 +31,19 @@
 
 ### 预编译二进制文件
 
-1. 从发布区下载适合您系统的二进制文件
-2. 将压缩包解压到您希望的位置
+1. 从发布区下载适合您系统的二进制文件：
+   - Windows: `ddns-update-windows-x86_64.zip`
+   - Linux x86: `ddns-update-linux-x86_64.tar.gz`
+   - Linux ARM: `ddns-update-linux-arm.tar.gz`
+2. 将压缩包解压到您希望的位置：
+   ```bash
+   # Windows
+   unzip ddns-update-windows-x86_64.zip -d "C:\Program Files\ddns-update\"
+   
+   # Linux
+   mkdir -p /opt/ddns-update
+   tar -xzf ddns-update-linux-x86_64.tar.gz -C /opt/ddns-update/
+   ```
 3. 使用您的DDNS提供商信息配置`config.yaml`文件
 
 ### 从源代码安装
@@ -46,6 +57,16 @@ cd ddns-update
 pip install -r requirements.txt
 
 # 运行客户端
+python src/ddns-client.py
+```
+
+**注意**：在Debian/Ubuntu系统（如Ubuntu 22.04+）上可能会遇到"externally-managed-environment"错误，这是因为这些系统实施了PEP 668。解决方法：
+
+```bash
+# 创建并使用虚拟环境（推荐）
+python3 -m venv ddns-venv
+source ddns-venv/bin/activate
+pip install -r requirements.txt
 python src/ddns-client.py
 ```
 
@@ -172,6 +193,36 @@ options:
 2. 对于Gmail或其他具有增强安全性的服务，您可能需要创建应用密码
 3. 验证防火墙是否允许SMTP端口上的出站连接
 
+### 程序执行后不退出
+
+如果程序在执行DDNS更新请求后挂起不退出：
+
+1. 最新版本已添加超时设置，更新到最新版本应该解决此问题
+2. 如果问题仍然存在，可以使用timeout命令限制运行时间：
+   ```bash
+   # Linux系统
+   timeout 60s ./ddns-update
+   
+   # Windows系统（需要安装timeout工具）
+   timeout /t 60 /nobreak && taskkill /f /im ddns-update.exe
+   ```
+
+### Debian/Ubuntu系统依赖安装问题
+
+在Debian/Ubuntu系统（如Ubuntu 22.04+）上安装依赖时可能会遇到"externally-managed-environment"错误：
+
+1. 使用虚拟环境（推荐）：
+   ```bash
+   python3 -m venv ddns-venv
+   source ddns-venv/bin/activate
+   pip install -r requirements.txt
+   ```
+
+2. 或使用系统包管理器：
+   ```bash
+   sudo apt install python3-yaml python3-requests
+   ```
+
 ## 许可证
 
 本项目采用MIT许可证 - 有关详细信息，请参阅LICENSE文件。
@@ -207,8 +258,19 @@ A lightweight DDNS (Dynamic DNS) client for updating IP addresses to DDNS servic
 
 ### Pre-compiled Binaries
 
-1. Download the appropriate binary for your system from the releases section
-2. Extract the archive to your desired location
+1. Download the appropriate binary for your system from the releases section:
+   - Windows: `ddns-update-windows-x86_64.zip`
+   - Linux x86: `ddns-update-linux-x86_64.tar.gz`
+   - Linux ARM: `ddns-update-linux-arm.tar.gz`
+2. Extract the archive to your desired location:
+   ```bash
+   # Windows
+   unzip ddns-update-windows-x86_64.zip -d "C:\Program Files\ddns-update\"
+   
+   # Linux
+   mkdir -p /opt/ddns-update
+   tar -xzf ddns-update-linux-x86_64.tar.gz -C /opt/ddns-update/
+   ```
 3. Configure the `config.yaml` file with your DDNS provider information
 
 ### From Source
@@ -222,6 +284,16 @@ cd ddns-update
 pip install -r requirements.txt
 
 # Run the client
+python src/ddns-client.py
+```
+
+**Note**: On Debian/Ubuntu systems (like Ubuntu 22.04+), you might encounter an "externally-managed-environment" error due to PEP 668. Solution:
+
+```bash
+# Create and use a virtual environment (recommended)
+python3 -m venv ddns-venv
+source ddns-venv/bin/activate
+pip install -r requirements.txt
 python src/ddns-client.py
 ```
 
@@ -347,6 +419,36 @@ The client logs all activities to a file named `run.log` in the working director
 1. Check your SMTP settings in config.yaml
 2. For Gmail or other services with enhanced security, you may need to create an app password
 3. Verify your firewall allows outgoing connections on the SMTP port
+
+### Program Doesn't Exit After Execution
+
+If the program hangs after sending DDNS update requests:
+
+1. The latest version has added timeout settings which should resolve this issue
+2. If the problem persists, you can use the timeout command to limit runtime:
+   ```bash
+   # Linux systems
+   timeout 60s ./ddns-update
+   
+   # Windows systems (requires timeout tool)
+   timeout /t 60 /nobreak && taskkill /f /im ddns-update.exe
+   ```
+
+### Dependency Installation Issues on Debian/Ubuntu
+
+On Debian/Ubuntu systems (like Ubuntu 22.04+), you might encounter an "externally-managed-environment" error when installing dependencies:
+
+1. Use a virtual environment (recommended):
+   ```bash
+   python3 -m venv ddns-venv
+   source ddns-venv/bin/activate
+   pip install -r requirements.txt
+   ```
+
+2. Or use the system package manager:
+   ```bash
+   sudo apt install python3-yaml python3-requests
+   ```
 
 ## License
 
