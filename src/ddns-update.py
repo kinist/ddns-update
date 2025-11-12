@@ -345,16 +345,31 @@ class DDNSClient:
     def _md5_password(self, password: str) -> str:
         """对密码进行MD5加密"""
         return hashlib.md5(password.encode('utf-8')).hexdigest()
+    
+    def _send_failure_email(self, username: str, error_msg: str) -> None:
+        """发送失败通知邮件"""
+        email_content = (
+            f"DDNS更新失败！\n\n"
+            f"用户: {username}\n"
+            f"错误: {error_msg}\n"
+            f"当前IP: {self.current_ip or '未获取'}\n"
+            f"更新时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+        )
+        self.send_email("DDNS更新失败通知", email_content)
 
     def update_ddns_for_user(self, username: str, password: str) -> bool:
         """更新单个用户的所有域名（不带hostname参数）"""
         try:
             if not self.current_ip:
-                logger.error(f"用户 {username}: 当前IP地址为空，无法更新")
+                error_msg = f"用户 {username}: 当前IP地址为空，无法更新"
+                logger.error(error_msg)
+                self._send_failure_email(username, error_msg)
                 return False
             
             if not is_valid_ipv4(self.current_ip):
-                logger.error(f"用户 {username}: IP地址格式无效: {self.current_ip}")
+                error_msg = f"用户 {username}: IP地址格式无效: {self.current_ip}"
+                logger.error(error_msg)
+                self._send_failure_email(username, error_msg)
                 return False
             
             md5_password = self._md5_password(password)
@@ -384,38 +399,47 @@ class DDNSClient:
             elif response_text.startswith('badauth'):
                 error_msg = f"用户 {username} 认证失败，请检查用户名和密码"
                 logger.error(error_msg)
+                self._send_failure_email(username, error_msg)
                 return False
             elif response_text.startswith('911'):
                 error_msg = f"用户 {username} 服务器维护中，10分钟后重试"
                 logger.error(error_msg)
+                self._send_failure_email(username, error_msg)
                 return False
             elif response_text.startswith('notfqdn'):
                 error_msg = f"用户 {username} 域名格式无效"
                 logger.error(error_msg)
+                self._send_failure_email(username, error_msg)
                 return False
             elif response_text.startswith('nohost'):
                 error_msg = f"用户 {username} 域名未找到"
                 logger.error(error_msg)
+                self._send_failure_email(username, error_msg)
                 return False
             elif response_text.startswith('dnserr'):
                 error_msg = f"用户 {username} DNS服务器错误"
                 logger.error(error_msg)
+                self._send_failure_email(username, error_msg)
                 return False
             else:
                 error_msg = f"用户 {username} DDNS更新失败: {response_text}"
                 logger.error(error_msg)
+                self._send_failure_email(username, error_msg)
                 return False
         except requests.exceptions.Timeout:
             error_msg = f"更新用户 {username} DDNS时请求超时"
             logger.error(error_msg)
+            self._send_failure_email(username, error_msg)
             return False
         except requests.exceptions.RequestException as e:
             error_msg = f"更新用户 {username} DDNS时网络错误: {e}"
             logger.error(error_msg)
+            self._send_failure_email(username, error_msg)
             return False
         except Exception as e:
             error_msg = f"更新用户 {username} DDNS时出错: {e}"
             logger.error(error_msg)
+            self._send_failure_email(username, error_msg)
             return False
 
     def update_all_users(self) -> bool:
@@ -425,7 +449,6 @@ class DDNSClient:
             return False
 
         success_count = 0
-        failed_users = []
         skipped_count = 0
 
         for user in self.users:
@@ -439,20 +462,11 @@ class DDNSClient:
                 
             if self.update_ddns_for_user(username, password):
                 success_count += 1
-            else:
-                failed_users.append(username)
+            # 注意：失败时已在 update_ddns_for_user 中发送邮件，这里不再发送
 
         total_valid_users = len(self.users) - skipped_count
         
-        if failed_users:
-            error_msg = (
-                f"以下用户DDNS更新失败：\n"
-                f"{', '.join(failed_users)}\n"
-                f"当前IP: {self.current_ip}\n"
-                f"成功: {success_count}/{total_valid_users}"
-            )
-            self.send_email("DDNS更新失败通知", error_msg)
-
+        # 返回是否所有用户都更新成功
         return success_count == total_valid_users and total_valid_users > 0
 
     def run_once(self) -> bool:
