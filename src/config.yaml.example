@@ -1,0 +1,71 @@
+# DDNS更新客户端配置文件
+# 配置文件位置：/etc/ddns-update/config.yaml
+# 首次启动时，如果config.yaml不存在，会自动从config.yaml.example复制
+
+# DDNS服务配置
+ddns:
+  # DDNS服务器地址
+  server: api-ipv4.dynu.com
+  
+  # DDNS服务器端口
+  port: 8245
+  
+  # 协议类型：http 或 https
+  protocol: http
+  
+  # API更新路径
+  path: /nic/update
+  
+  # 上次更新的IP地址（程序自动更新，无需手动修改）
+  last_ip: 0.0.0.0
+  
+  # 用户列表（支持多用户，每个用户下的所有域名都会自动更新）
+  # 注意：更新时不带hostname参数，仅使用username，会更新该用户下的所有域名
+  users:
+    # 用户1配置
+    - username: user1
+      password: pwd1
+    
+    # 用户2配置
+    - username: user2
+      password: pwd2
+    
+    # 用户3配置
+    - username: user3
+      password: pwd3
+  
+  # 自动更新频率（使用crontab格式）
+  # 格式：分钟 小时 日期 月份 星期
+  # 示例：
+  #   "*/5 * * * *"    - 每5分钟执行一次
+  #   "0 * * * *"      - 每小时整点执行
+  #   "0 */2 * * *"    - 每2小时执行一次
+  #   "0 0 * * *"      - 每天午夜执行
+  #   "0 9,17 * * *"   - 每天9点和17点执行
+  #   "0 0 * * 0"      - 每周日午夜执行
+  #   "0 0 1 * *"      - 每月1号午夜执行
+  schedule: "*/1 * * * *"
+
+# SMTP邮件通知配置
+smtp:
+  # SMTP服务器地址
+  server: mail.sohu.com
+  
+  # SMTP服务器端口（常用：25, 465, 587）
+  port: 465
+  
+  # 邮箱账户用户名
+  username: example@sohu.com
+  
+  # 邮箱账户密码
+  password: password
+  
+  # 发件人邮箱地址
+  sender: example@sohu.com
+  
+  # 收件人邮箱地址（接收通知邮件）
+  receiver: ddns-update@qq.com
+  
+  # 是否使用TLS加密（端口465使用SSL，其他端口可配置TLS）
+  use_tls: false
+
