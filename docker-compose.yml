@@ -1,23 +1,16 @@
-version: '3.8'
-
 services:
   ddns-update:
     build:
       context: .
       dockerfile: Dockerfile
+    image: kinist/ddns-update:0.9
     container_name: ddns-update
     restart: unless-stopped
     volumes:
-      # 挂载配置目录（宿主机:容器）
-      - ./config:/etc/ddns-update
-      # 挂载日志目录（宿主机:容器）
-      - ./logs:/var/log/ddns-update
-    environment:
-      # 设置时区
-      - TZ=Asia/Shanghai
-    # 网络模式
+      - ./persistence/config:/etc/ddns-update
+      - ./persistence/logs:/var/log/ddns-update
+      - /etc/localtime:/etc/localtime:ro
     network_mode: bridge
-    # 健康检查
     healthcheck:
       # 检查健康检查标记文件是否存在且时间戳在10分钟内
       test: ["CMD-SHELL", "test -f /tmp/ddns-update.health && test $(expr $(date +%s) - $(cat /tmp/ddns-update.health)) -lt 600"]
@@ -25,4 +18,3 @@ services:
       timeout: 10s       # 超时时间10秒
       retries: 3         # 连续失败3次才标记为不健康
       start_period: 40s  # 启动后40秒内不检查（给程序初始化时间）
-

@@ -57,7 +57,7 @@ cd ddns-update
 pip install -r requirements.txt
 
 # 运行客户端
-python src/ddns-client.py
+python src/ddns-update.py
 ```
 
 **注意**：在Debian/Ubuntu系统（如Ubuntu 22.04+）上可能会遇到"externally-managed-environment"错误，这是因为这些系统实施了PEP 668。解决方法：
@@ -67,7 +67,7 @@ python src/ddns-client.py
 python3 -m venv ddns-venv
 source ddns-venv/bin/activate
 pip install -r requirements.txt
-python src/ddns-client.py
+python src/ddns-update.py
 ```
 
 ## 使用方法
@@ -155,7 +155,7 @@ smtp:
 ## 命令行参数
 
 ```
-usage: ddns-client [-h] [-d DIRECTORY]
+usage: ddns-update [-h] [-d DIRECTORY]
 
 DDNS客户端程序
 
@@ -284,7 +284,7 @@ cd ddns-update
 pip install -r requirements.txt
 
 # Run the client
-python src/ddns-client.py
+python src/ddns-update.py
 ```
 
 **Note**: On Debian/Ubuntu systems (like Ubuntu 22.04+), you might encounter an "externally-managed-environment" error due to PEP 668. Solution:
@@ -294,7 +294,7 @@ python src/ddns-client.py
 python3 -m venv ddns-venv
 source ddns-venv/bin/activate
 pip install -r requirements.txt
-python src/ddns-client.py
+python src/ddns-update.py
 ```
 
 ## Usage
@@ -382,7 +382,7 @@ smtp:
 ## Command Line Arguments
 
 ```
-usage: ddns-client [-h] [-d DIRECTORY]
+usage: ddns-update [-h] [-d DIRECTORY]
 
 DDNS client program
 

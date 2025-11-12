@@ -1,0 +1,49 @@
+# Python编译文件
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# 构建和发布
+docs/
+assets/
+
+# 配置文件(可能包含敏感信息)
+# 根据需要取消注释
+# config.yaml
+persistence/
+
+# 运行时临时文件
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+
+# 编辑器/IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*.sublime-workspace
+*.sublime-project
+.project
+.pydevproject
+.settings/
+
+# 操作系统
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+
+# 虚拟环境
+venv/
+env/
+ENV/
+.env
+.venv
+.Python
+
+# Docker相关
+docker-compose.override.yml
+.docker/ 

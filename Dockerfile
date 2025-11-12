@@ -10,18 +10,16 @@ COPY requirements.txt .
 # 安装Python依赖
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 复制源代码
-COPY src/ /app/
-
 # 创建必要的目录
 RUN mkdir -p /etc/ddns-update /var/log/ddns-update
 
-# 复制配置文件示例到应用目录（不会被挂载覆盖）
+# 只复制必要的文件
+COPY src/ddns-update.py /app/ddns-update.py
 COPY src/config.yaml.example /app/config.yaml.example
 
 # 设置执行权限
-RUN chmod +x /app/ddns-client.py
+RUN chmod +x /app/ddns-update.py
 
 # 运行程序
-CMD ["python", "/app/ddns-client.py"]
+CMD ["python", "/app/ddns-update.py"]
 
