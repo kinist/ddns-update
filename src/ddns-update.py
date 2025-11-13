@@ -36,11 +36,11 @@ SMTP_TIMEOUT = 30
 MIN_CRON_INTERVAL_MINUTES = 1  # 最小更新间隔（分钟）
 IP_V4_PATTERN = re.compile(r'^(\d{1,3}\.){3}\d{1,3}$')
 
-# IP检测服务列表
+# IP检测服务列表（优先使用中国境内可访问的服务）
 IP_CHECK_SERVICES = [
     {'url': 'http://ddns.oray.com/checkip', 'pattern': r'Current IP Address: (\d+\.\d+\.\d+\.\d+)'},
     {'url': 'https://myip.ipip.net', 'pattern': r'当前 IP：(\d+\.\d+\.\d+\.\d+)'},
-    {'url': 'https://api.ipify.org', 'pattern': r'^(\d+\.\d+\.\d+\.\d+)$'},  # 备用服务
+    {'url': 'http://ip.3322.net', 'pattern': r'^(\d+\.\d+\.\d+\.\d+)$'},  # 备用服务（中国境内可用）
 ]
 
 def is_valid_ipv4(ip: str) -> bool:
